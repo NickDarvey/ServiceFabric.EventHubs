@@ -1,0 +1,30 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27428.2015
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceFabric.EventHubs.ReliableServices", "ServiceFabric.EventHubs.ReliableServices\ServiceFabric.EventHubs.ReliableServices.csproj", "{ADE55985-B66A-4447-9307-33BF56E5EE28}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B284B3D2-D627-4132-830E-A64D78EA7EDE}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{ADE55985-B66A-4447-9307-33BF56E5EE28}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ADE55985-B66A-4447-9307-33BF56E5EE28}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ADE55985-B66A-4447-9307-33BF56E5EE28}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ADE55985-B66A-4447-9307-33BF56E5EE28}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {223E1D22-3FC0-4A1F-974C-4E9B60857031}
+	EndGlobalSection
+EndGlobal
