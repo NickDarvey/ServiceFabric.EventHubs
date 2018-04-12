@@ -52,7 +52,7 @@ I've tried these (and a number of other) ways of integration and the co-location
 
 * Performance
   
-  In-process method beats network calls.
+  In-process method calls beats network calls.
   Part of the reason you probably chose Service Fabric was that state was kept with compute.
   If you care about that, you probably care about reducing the network hops too.
 
