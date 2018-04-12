@@ -1,6 +1,8 @@
 ﻿using Microsoft.Azure.EventHubs;
 using Microsoft.ServiceFabric.Data;
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace NickDarvey.ServiceFabric.EventHubs
 {
@@ -40,6 +42,20 @@ namespace NickDarvey.ServiceFabric.EventHubs
             factory.InitialEpoch = initialEpoch;
             return factory;
         }
+
+        public static Task ProcessAsync(
+            this Task<IReceiverConnection> receiverConnection,
+            ProcessEvents processEvents,
+            ProcessErrors processErrors,
+            int? maxBatchSize = default,
+            TimeSpan? waitTime = default,
+            CancellationToken cancellationToken = default) =>
+            receiverConnection.ContinueWith(t => t.Result.RunAsync(
+                processEvents: processEvents,
+                processErrors: processErrors,
+                maxBatchSize: maxBatchSize,
+                waitTime: waitTime,
+                cancellationToken: cancellationToken));
 
         private static ReliableEventHubReceiverConnectionFactory GetImplementation(IReceiverConnectionFactory @interface) =>
             @interface is ReliableEventHubReceiverConnectionFactory implementation
