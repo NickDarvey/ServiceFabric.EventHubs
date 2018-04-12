@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ApplicationManifest ApplicationTypeName="SampleApplicationType"
+                     ApplicationTypeVersion="1.0.0"
+                     xmlns="http://schemas.microsoft.com/2011/01/fabric"
+                     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Parameters>
+    <Parameter Name="ReliableService_MinReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="ReliableService_PartitionCount" DefaultValue="4" />
+    <Parameter Name="ReliableService_TargetReplicaSetSize" DefaultValue="3" />
+  </Parameters>
+  <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="ReliableServicePkg" ServiceManifestVersion="1.0.0" />
+    <ConfigOverrides />
+  </ServiceManifestImport>
+  <DefaultServices>
+    <Service Name="ReliableService" ServicePackageActivationMode="ExclusiveProcess">
+      <StatefulService ServiceTypeName="ReliableServiceType" TargetReplicaSetSize="[ReliableService_TargetReplicaSetSize]" MinReplicaSetSize="[ReliableService_MinReplicaSetSize]">
+        <UniformInt64Partition PartitionCount="[ReliableService_PartitionCount]" LowKey="0" HighKey="3" />
+      </StatefulService>
+    </Service>
+  </DefaultServices>
+</ApplicationManifest>
