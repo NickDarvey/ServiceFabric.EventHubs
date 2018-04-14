@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27428.2015
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceFabric.EventHubs.ReliableServices", "ServiceFabric.EventHubs.ReliableServices\ServiceFabric.EventHubs.ReliableServices.csproj", "{ADE55985-B66A-4447-9307-33BF56E5EE28}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceFabric.EventHubs", "ServiceFabric.EventHubs\ServiceFabric.EventHubs.csproj", "{ADE55985-B66A-4447-9307-33BF56E5EE28}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B284B3D2-D627-4132-830E-A64D78EA7EDE}"
 	ProjectSection(SolutionItems) = preProject
@@ -14,7 +14,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{A07B5EB6-E848-4116-A8D0-A826331D98C6}") = "SampleApplication", "Samples\SampleApplication\SampleApplication.sfproj", "{4D241CCF-5BF2-47D1-BD67-2C5817C8D1EB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReliableService", "Samples\ReliableServices\ReliableService\ReliableService.csproj", "{E8154E52-DDA1-44C1-B8DF-5D3842713469}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReliableService", "Samples\ReliableServices\ReliableService\ReliableService.csproj", "{E8154E52-DDA1-44C1-B8DF-5D3842713469}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{4448BE28-5E9F-48EB-881A-C946EA839321}"
 EndProject

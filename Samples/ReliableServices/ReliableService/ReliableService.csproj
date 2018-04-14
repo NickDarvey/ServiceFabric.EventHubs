@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\ServiceFabric.EventHubs.ReliableServices\ServiceFabric.EventHubs.ReliableServices.csproj" />
+    <ProjectReference Include="..\..\..\ServiceFabric.EventHubs\ServiceFabric.EventHubs.csproj" />
   </ItemGroup>
 
 </Project>
