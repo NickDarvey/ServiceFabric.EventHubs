@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.EventHubs;
+using static NickDarvey.ServiceFabric.EventHubs.Diagnostics;
 
 namespace NickDarvey.ServiceFabric.EventHubs
 {
@@ -47,8 +49,15 @@ namespace NickDarvey.ServiceFabric.EventHubs
             {
                 if (cancellationToken.IsCancellationRequested) break;
 
+                var activity = new Activity("Process");
+
                 try
                 {
+                    if (ReceiveDiagnostics.IsEnabled("Process"))
+                        ReceiveDiagnostics.StartActivity(
+                        activity: activity,
+                        args: new { });
+
                     var events = await _receiver.ReceiveAsync(
                         maxMessageCount: maxBatchSize ?? Constants.DefaultMaxBatchSize,
                         waitTime: waitTime ?? Constants.DefaultOperationTimeout).ConfigureAwait(false);
@@ -59,7 +68,8 @@ namespace NickDarvey.ServiceFabric.EventHubs
                 }
                 catch (ReceiverDisconnectedException ex)
                 {
-                    // TODO: Warn
+                    if (ReceiveDiagnostics.IsEnabled("Disconnection"))
+                        ReceiveDiagnostics.Write("Disconnection", new { Exception = ex });
 
                     // Another partition has picked up the work,
                     // end the loop and finish RunAsync.
@@ -68,8 +78,18 @@ namespace NickDarvey.ServiceFabric.EventHubs
                 }
                 catch (Exception ex)
                 {
+                    if (ReceiveDiagnostics.IsEnabled("Failure"))
+                        ReceiveDiagnostics.Write("Failure", new { Exception = ex });
+
                     await handler.ProcessErrorAsync(ex).ConfigureAwait(false);
                     throw;
+                }
+                finally
+                {
+                    if (ReceiveDiagnostics.IsEnabled("Process"))
+                        ReceiveDiagnostics.StopActivity(
+                        activity: activity,
+                        args: new { });
                 }
             }
         }
