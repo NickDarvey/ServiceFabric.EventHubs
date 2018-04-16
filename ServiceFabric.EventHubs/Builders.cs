@@ -1,5 +1,6 @@
 ﻿using Microsoft.Azure.EventHubs;
 using Microsoft.ServiceFabric.Data;
+using Microsoft.ServiceFabric.Services.Runtime;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,26 +9,26 @@ namespace NickDarvey.ServiceFabric.EventHubs
 {
     public static class Builders
     {
-        public static IReceiverConnectionFactory WithServiceFabricIntegration(this EventHubClient client, IReliableStateManager state) =>
-            client.UseServiceFabricState(state).WithBatchCheckpointing();
+        public static IReceiverConnectionFactory WithServiceFabricIntegration(this EventHubClient client, StatefulService service) =>
+            client.UseServiceFabricState(service).WithBatchCheckpointing();
 
         public struct ServiceFabricEventHubsBuilder
         {
             internal EventHubClient Client { get; }
-            internal IReliableStateManager StateManager { get; }
+            internal StatefulService Service { get; }
 
-            internal ServiceFabricEventHubsBuilder(EventHubClient client, IReliableStateManager stateManager)
+            internal ServiceFabricEventHubsBuilder(EventHubClient client, StatefulService service)
             {
                 Client = client;
-                StateManager = stateManager;
+                Service = service;
             }
         }
 
-        public static ServiceFabricEventHubsBuilder UseServiceFabricState(this EventHubClient client, IReliableStateManager state) =>
-            new ServiceFabricEventHubsBuilder(client, state);
+        public static ServiceFabricEventHubsBuilder UseServiceFabricState(this EventHubClient client, StatefulService service) =>
+            new ServiceFabricEventHubsBuilder(client, service);
 
         public static IReceiverConnectionFactory WithBatchCheckpointing(this ServiceFabricEventHubsBuilder builder) =>
-            new ReliableEventHubReceiverConnectionFactory(builder.Client, builder.StateManager, checkpointer => (events, errors) => new BatchCheckpointEventHandler(events, errors, checkpointer));
+            new ReliableEventHubReceiverConnectionFactory(builder.Client, builder.Service.StateManager, builder.Service.Context.ServiceName, checkpointer => (events, errors) => new BatchCheckpointEventHandler(events, errors, checkpointer));
 
         public static IReceiverConnectionFactory WithInitialPosition(this IReceiverConnectionFactory connectionFactory, EventPosition initalPosition)
         {

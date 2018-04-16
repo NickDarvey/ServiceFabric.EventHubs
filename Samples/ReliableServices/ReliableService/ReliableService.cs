@@ -20,7 +20,7 @@ namespace NickDarvey.SampleApplication.ReliableService
             EventHubClient.CreateFromConnectionString("")
 
             // Pass in the state manager, we'll use this to do our checkpointing.
-            .UseServiceFabricState(StateManager)
+            .UseServiceFabricState(this)
 
             // Pick the style of checkpointing to use.
             .WithBatchCheckpointing()
