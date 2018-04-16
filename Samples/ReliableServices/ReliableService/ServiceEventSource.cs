@@ -25,7 +25,7 @@ namespace NickDarvey.SampleApplication.ReliableService
         {
             if (IsEnabled())
             {
-                WriteEvent(MessageEventId, message);
+                WriteEvent(ErrorEventId, message);
             }
         }
     }
