@@ -10,14 +10,22 @@ namespace NickDarvey.SampleApplication.ReliableService
 {
     internal sealed class ReliableService : StatefulService
     {
+        private readonly string ConnectionString;
+
         public ReliableService(StatefulServiceContext context)
             : base(context)
-        { }
+        {
+            ConnectionString = Context.CodePackageActivationContext
+                .GetConfigurationPackageObject("Config").Settings
+                .Sections["EventHubs"]
+                .Parameters["ConnectionString"]
+                .Value;
+        }
 
         protected override Task RunAsync(CancellationToken cancellationToken) =>
 
             // Create the Event Hub client, as you usually would.
-            EventHubClient.CreateFromConnectionString("")
+            EventHubClient.CreateFromConnectionString(ConnectionString)
 
             // Pass in the state manager, we'll use this to do our checkpointing.
             .UseServiceFabricState(this)
