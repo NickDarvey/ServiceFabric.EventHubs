@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.EventHubs;
@@ -50,6 +51,7 @@ namespace NickDarvey.ServiceFabric.EventHubs
                 if (cancellationToken.IsCancellationRequested) break;
 
                 var activity = new Activity("Process");
+                var events = default(IEnumerable<EventData>);
 
                 try
                 {
@@ -58,7 +60,7 @@ namespace NickDarvey.ServiceFabric.EventHubs
                         activity: activity,
                         args: new { });
 
-                    var events = await _receiver.ReceiveAsync(
+                    events = await _receiver.ReceiveAsync(
                         maxMessageCount: maxBatchSize ?? Constants.DefaultMaxBatchSize,
                         waitTime: waitTime ?? Constants.DefaultOperationTimeout).ConfigureAwait(false);
 
@@ -86,6 +88,9 @@ namespace NickDarvey.ServiceFabric.EventHubs
                 }
                 finally
                 {
+                    if (events != null)
+                        foreach (var @event in events) @event.Dispose();
+
                     if (ReceiveDiagnostics.IsEnabled("Process"))
                         ReceiveDiagnostics.StopActivity(
                         activity: activity,
