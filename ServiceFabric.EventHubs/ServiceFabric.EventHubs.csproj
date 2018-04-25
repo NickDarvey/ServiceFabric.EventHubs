@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
-    <AssemblyName>NickDarvey.ServiceFabric.EventHubs.ReliableServices</AssemblyName>
+    <AssemblyName>NickDarvey.ServiceFabric.EventHubs</AssemblyName>
     <RootNamespace>NickDarvey.ServiceFabric.EventHubs</RootNamespace>
   </PropertyGroup>
 
