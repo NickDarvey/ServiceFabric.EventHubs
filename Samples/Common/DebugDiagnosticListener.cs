@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace NickDarvey.SampleApplication.ReliableService
+namespace NickDarvey.SampleApplication.Common
 {
-    internal class DebugListenerObserver : IObserver<DiagnosticListener>
+    public class DebugListenerObserver : IObserver<DiagnosticListener>
     {
         public void OnCompleted() =>
             Debug.WriteLine("Diagnostics completed");

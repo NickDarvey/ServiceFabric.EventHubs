@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <IsServiceFabricServiceProject>True</IsServiceFabricServiceProject>
+    <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
+    <AssemblyName>NickDarvey.SampleApplication.ReliableService.AspNetCore</AssemblyName>
+    <RootNamespace>NickDarvey.SampleApplication.ReliableService.AspNetCore</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.7" />
+    <PackageReference Include="Microsoft.ServiceFabric" Version="6.2.262" />
+    <PackageReference Include="Microsoft.ServiceFabric.AspNetCore.Kestrel" Version="3.1.262" />
+    <PackageReference Include="Microsoft.ServiceFabric.Data" Version="3.1.262" />
+    <PackageReference Include="Microsoft.ServiceFabric.Services" Version="3.1.262" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\ServiceFabric.EventHubs.AspNetCore\ServiceFabric.EventHubs.AspNetCore.csproj" />
+    <ProjectReference Include="..\Common\Common.csproj" />
+  </ItemGroup>
+
+</Project>

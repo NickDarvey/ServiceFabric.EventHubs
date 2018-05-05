@@ -11,14 +11,21 @@ namespace NickDarvey.SampleApplication.ReliableService
     internal sealed class ReliableService : StatefulService
     {
         private readonly string ConnectionString;
+        private readonly string ConsumerGroupName;
 
         public ReliableService(StatefulServiceContext context)
             : base(context)
         {
-            ConnectionString = Context.CodePackageActivationContext
+            var config = Context.CodePackageActivationContext
                 .GetConfigurationPackageObject("Config").Settings
-                .Sections["EventHubs"]
+                .Sections["EventHubs"];
+
+            ConnectionString = config
                 .Parameters["ConnectionString"]
+                .Value;
+
+            ConsumerGroupName = config
+                .Parameters["ConsumerGroupName"]
                 .Value;
         }
 
@@ -36,7 +43,7 @@ namespace NickDarvey.SampleApplication.ReliableService
             // Create a connection to an Event Hub partition
             .CreateReceiver(
                 partitionKey: ((Int64RangePartitionInformation)Partition.PartitionInfo).LowKey,
-                consumerGroupName: "$Default",
+                consumerGroupName: ConsumerGroupName,
                 cancel: cancellationToken)
 
             // Start processing events

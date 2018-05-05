@@ -4,7 +4,7 @@ using System.Threading;
 using Microsoft.ServiceFabric.Services.Runtime;
 using NickDarvey.SampleApplication.Common;
 
-namespace NickDarvey.SampleApplication.ReliableService
+namespace NickDarvey.SampleApplication.ReliableService.AspNetCore
 {
     internal static class Program
     {
@@ -12,8 +12,8 @@ namespace NickDarvey.SampleApplication.ReliableService
         {
             var _ = new ArgumentException();
 
-            ServiceRuntime.RegisterServiceAsync("ReliableServiceType",
-                context => new ReliableService(context)).GetAwaiter().GetResult();
+            ServiceRuntime.RegisterServiceAsync("ReliableService.AspNetCoreType",
+                context => new ReliableServiceAspNetCore(context)).GetAwaiter().GetResult();
             DiagnosticListener.AllListeners.Subscribe(new DebugListenerObserver());
             Thread.Sleep(Timeout.Infinite);
         }

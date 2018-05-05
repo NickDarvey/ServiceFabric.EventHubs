@@ -1,19 +1,49 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ApplicationManifest xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ApplicationTypeName="SampleApplicationType" ApplicationTypeVersion="1.0.0" xmlns="http://schemas.microsoft.com/2011/01/fabric">
   <Parameters>
-    <Parameter Name="ReliableService_MinReplicaSetSize" DefaultValue="3" />
-    <Parameter Name="ReliableService_PartitionCount" DefaultValue="2" />
-    <Parameter Name="ReliableService_TargetReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="MinReplicaSetSize" DefaultValue="1" />
+    <Parameter Name="TargetReplicaSetSize" DefaultValue="1" />
+    <Parameter Name="EventHubPartitionCount" DefaultValue="2" />
+    <Parameter Name="EventHubLowKey" DefaultValue="0" />
+    <Parameter Name="EventHubHighKey" DefaultValue="1" />
+    <Parameter Name="EventHubConnectionString" DefaultValue="Endpoint=sb://ohvrzw8j1k.servicebus.windows.net/;SharedAccessKeyName=test;SharedAccessKey=xjpa5oHmOudq4fe/FOE8JzosMDPWVfALgKmjyOyhqes=;EntityPath=test" />
   </Parameters>
   <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="ReliableService.AspNetCorePkg" ServiceManifestVersion="1.0.0" />
+    <ConfigOverrides>
+      <ConfigOverride Name="Config">
+        <Settings>
+          <Section Name="EventHubs">
+            <Parameter Name="ConnectionString" Value="[EventHubConnectionString]" />
+            <Parameter Name="ConsumerGroupName" Value="$Default" />
+          </Section>
+        </Settings>
+      </ConfigOverride>
+    </ConfigOverrides>
+  </ServiceManifestImport>
+  <ServiceManifestImport>
     <ServiceManifestRef ServiceManifestName="ReliableServicePkg" ServiceManifestVersion="1.0.0" />
-    <ConfigOverrides />
+    <ConfigOverrides>
+      <ConfigOverride Name="Config">
+        <Settings>
+          <Section Name="EventHubs">
+            <Parameter Name="ConnectionString" Value="[EventHubConnectionString]" />
+            <Parameter Name="ConsumerGroupName" Value="$Default" />
+          </Section>
+        </Settings>
+      </ConfigOverride>
+    </ConfigOverrides>
   </ServiceManifestImport>
   <DefaultServices>
-    <Service Name="ReliableService" ServicePackageActivationMode="ExclusiveProcess">
-      <StatefulService ServiceTypeName="ReliableServiceType" TargetReplicaSetSize="[ReliableService_TargetReplicaSetSize]" MinReplicaSetSize="[ReliableService_MinReplicaSetSize]">
-        <UniformInt64Partition PartitionCount="[ReliableService_PartitionCount]" LowKey="0" HighKey="1" />
+    <Service Name="ReliableService.AspNetCore" ServicePackageActivationMode="ExclusiveProcess">
+      <StatefulService ServiceTypeName="ReliableService.AspNetCoreType" TargetReplicaSetSize="[TargetReplicaSetSize]" MinReplicaSetSize="[MinReplicaSetSize]">
+        <UniformInt64Partition PartitionCount="[EventHubPartitionCount]" LowKey="[EventHubLowKey]" HighKey="[EventHubHighKey]" />
       </StatefulService>
     </Service>
+    <!--<Service Name="ReliableService" ServicePackageActivationMode="ExclusiveProcess">
+      <StatefulService ServiceTypeName="ReliableServiceType" TargetReplicaSetSize="[TargetReplicaSetSize]" MinReplicaSetSize="[MinReplicaSetSize]">
+        <UniformInt64Partition PartitionCount="[EventHubPartitionCount]" LowKey="[EventHubLowKey]" HighKey="[EventHubHighKey]" />
+      </StatefulService>
+    </Service>-->
   </DefaultServices>
 </ApplicationManifest>

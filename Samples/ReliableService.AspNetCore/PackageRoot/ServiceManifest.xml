@@ -1,27 +1,22 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<ServiceManifest Name="ReliableServicePkg"
+<ServiceManifest Name="ReliableService.AspNetCorePkg"
                  Version="1.0.0"
                  xmlns="http://schemas.microsoft.com/2011/01/fabric"
                  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <ServiceTypes>
-    <StatefulServiceType ServiceTypeName="ReliableServiceType" HasPersistedState="true" />
+    <StatefulServiceType ServiceTypeName="ReliableService.AspNetCoreType"  HasPersistedState="true" />
   </ServiceTypes>
 
   <CodePackage Name="Code" Version="1.0.0">
     <EntryPoint>
       <ExeHost>
-        <Program>NickDarvey.SampleApplication.ReliableService.exe</Program>
+        <Program>NickDarvey.SampleApplication.ReliableService.AspNetCore.exe</Program>
+        <WorkingFolder>CodePackage</WorkingFolder>
       </ExeHost>
     </EntryPoint>
   </CodePackage>
 
   <ConfigPackage Name="Config" Version="1.0.0" />
 
-  <Resources>
-    <Endpoints>
-      <Endpoint Name="ServiceEndpoint" />
-      <Endpoint Name="ReplicatorEndpoint" />
-    </Endpoints>
-  </Resources>
 </ServiceManifest>
