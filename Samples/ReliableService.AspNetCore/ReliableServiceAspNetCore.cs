@@ -23,7 +23,6 @@ namespace NickDarvey.SampleApplication.ReliableService.AspNetCore
     {
         private readonly string ConnectionString;
         private readonly string ConsumerGroupName;
-        private readonly InMemoryServer Server;
 
         public ReliableServiceAspNetCore(StatefulServiceContext context)
             : base(context)
@@ -39,8 +38,6 @@ namespace NickDarvey.SampleApplication.ReliableService.AspNetCore
             ConsumerGroupName = config
                 .Parameters["ConsumerGroupName"]
                 .Value;
-
-            Server = new InMemoryServer();
         }
 
         protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners() =>
@@ -48,14 +45,10 @@ namespace NickDarvey.SampleApplication.ReliableService.AspNetCore
             {
                 new ServiceReplicaListener(serviceContext =>
                 new KestrelCommunicationListener(serviceContext, (url, listener) =>
-                new WebHostBuilder()
-                .UseKestrel()
-                .UseServer(Server)
+                CreateWebHostBuilder()
                 .ConfigureServices(services => services
                     .AddSingleton(serviceContext)
                     .AddSingleton(StateManager))
-                .UseContentRoot(Directory.GetCurrentDirectory())
-                .UseStartup<Startup>()
                 .UseServiceFabricIntegration(listener, ServiceFabricIntegrationOptions.UseUniqueServiceUrl)
                 .UseUrls(url)
                 .Build()))
@@ -79,17 +72,23 @@ namespace NickDarvey.SampleApplication.ReliableService.AspNetCore
 
             // Start processing events
             .ProcessAsync(
-                server: Server,
-                processEventRequestBuilder: req =>
+                webHostBuilder: CreateWebHostBuilder(),
+                eventRequestBuilder: req =>
                 {
                     req.RequestUri = new Uri("/test/events");
                     req.Method = HttpMethod.Post;
                 },
-                processErrorRequestBuilder: req =>
+                errorRequestBuilder: req =>
                 {
                     req.RequestUri = new Uri("/test/errors");
                     req.Method = HttpMethod.Post;
                 },
                 cancellationToken: cancellationToken);
+
+        private static IWebHostBuilder CreateWebHostBuilder() =>
+            new WebHostBuilder()
+            .UseKestrel()
+            .UseContentRoot(Directory.GetCurrentDirectory())
+            .UseStartup<Startup>();
     }
 }

@@ -9,6 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		.gitignore = .gitignore
+		Common.props = Common.props
 		README.md = README.md
 	EndProjectSection
 EndProject
@@ -23,8 +24,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReliableService.AspNetCore", "Samples\ReliableService.AspNetCore\ReliableService.AspNetCore.csproj", "{DA3288D8-A5C6-438B-97D5-6C355CB055AC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common", "Samples\Common\Common.csproj", "{E0FE26E3-0B53-4257-ABA3-D97C439F380D}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceFabric.EventHubs.AspNetCore.IntegrationTests", "ServiceFabric.EventHubs.AspNetCore.IntegrationTests\ServiceFabric.EventHubs.AspNetCore.IntegrationTests.csproj", "{4B435B53-366D-4D35-BDDF-F37DF55D3071}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -82,14 +81,6 @@ Global
 		{E0FE26E3-0B53-4257-ABA3-D97C439F380D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E0FE26E3-0B53-4257-ABA3-D97C439F380D}.Release|x64.ActiveCfg = Release|Any CPU
 		{E0FE26E3-0B53-4257-ABA3-D97C439F380D}.Release|x64.Build.0 = Release|Any CPU
-		{4B435B53-366D-4D35-BDDF-F37DF55D3071}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4B435B53-366D-4D35-BDDF-F37DF55D3071}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4B435B53-366D-4D35-BDDF-F37DF55D3071}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{4B435B53-366D-4D35-BDDF-F37DF55D3071}.Debug|x64.Build.0 = Debug|Any CPU
-		{4B435B53-366D-4D35-BDDF-F37DF55D3071}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4B435B53-366D-4D35-BDDF-F37DF55D3071}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4B435B53-366D-4D35-BDDF-F37DF55D3071}.Release|x64.ActiveCfg = Release|Any CPU
-		{4B435B53-366D-4D35-BDDF-F37DF55D3071}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

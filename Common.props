@@ -1,0 +1,9 @@
+<Project>
+
+  <PropertyGroup>
+    <RootNamespace>NickDarvey.ServiceFabric.EventHubs</RootNamespace>
+    <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+</Project>

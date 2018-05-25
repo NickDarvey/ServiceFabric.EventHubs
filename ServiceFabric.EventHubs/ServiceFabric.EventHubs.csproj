@@ -1,19 +1,14 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../Common.props" />
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
     <AssemblyName>NickDarvey.ServiceFabric.EventHubs</AssemblyName>
-    <RootNamespace>NickDarvey.ServiceFabric.EventHubs</RootNamespace>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Azure.EventHubs" Version="2.0.0" />
-    <PackageReference Include="Microsoft.ServiceFabric.Services" Version="3.1.262" />
+    <PackageReference Include="Microsoft.ServiceFabric.Services" Version="3.1.269" />
   </ItemGroup>
 
 </Project>
