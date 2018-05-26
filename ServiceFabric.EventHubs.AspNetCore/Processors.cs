@@ -10,9 +10,9 @@ namespace NickDarvey.ServiceFabric.EventHubs
             async events =>
             {
                 // Execute in series, so the receiver gets them in correct order.
-                foreach(var @event in events)
+                foreach (var @event in events)
                 {
-                    await Process(@event, client, requestBuilder, Transformations.Convert);
+                    await Process(@event, client, requestBuilder, Transformations.Convert).ConfigureAwait(false);
                 }
             };
 
@@ -23,7 +23,12 @@ namespace NickDarvey.ServiceFabric.EventHubs
         {
             var req = converter(value);
 
-            requestBuilder(req);
+            try { requestBuilder(req); }
+            catch (Exception ex)
+            {
+                throw new ArgumentException(
+                    $"The request builder ({requestBuilder}) failed to build a request. {ex.Message}", ex);
+            }
 
             if (req.RequestUri == null) throw new ArgumentException(
                 "You must specify a HTTP request URI (request.RequestUri) using the request builder.");

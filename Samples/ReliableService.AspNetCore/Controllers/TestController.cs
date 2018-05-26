@@ -1,4 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.IO;
+using System.Text;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NickDarvey.SampleApplication.ReliableService.AspNetCore.Models;
 
@@ -16,10 +19,14 @@ namespace NickDarvey.SampleApplication.ReliableService.AspNetCore.Controllers
         }
 
         [HttpPost("errors")]
-        public Task ReceiveErrors(string error)
+        public async Task ReceiveErrors()
         {
-            ServiceEventSource.Current.Error("Received an error: " + error);
-            return Task.CompletedTask;
+            using (var reader = new StreamReader(Request.Body, Encoding.UTF8))
+            {
+                var ex = await reader.ReadToEndAsync();
+                ServiceEventSource.Current.Error("Received an error: " + ex);
+
+            }
         }
     }
 }

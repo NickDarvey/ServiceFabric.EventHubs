@@ -11,11 +11,18 @@ namespace NickDarvey.SampleApplication.ReliableService.AspNetCore
         private static void Main()
         {
             var _ = new ArgumentException();
+            try
+            {
 
-            ServiceRuntime.RegisterServiceAsync("ReliableService.AspNetCoreType",
-                context => new ReliableServiceAspNetCore(context)).GetAwaiter().GetResult();
-            DiagnosticListener.AllListeners.Subscribe(new DebugListenerObserver());
-            Thread.Sleep(Timeout.Infinite);
+                ServiceRuntime.RegisterServiceAsync("ReliableService.AspNetCoreType",
+                    context => new ReliableServiceAspNetCore(context)).GetAwaiter().GetResult();
+                DiagnosticListener.AllListeners.Subscribe(new DebugListenerObserver());
+                Thread.Sleep(Timeout.Infinite);
+            }
+            catch(Exception ex)
+            {
+                ServiceEventSource.Current.Message(ex.Message);
+            }
         }
     }
 }

@@ -75,12 +75,12 @@ namespace NickDarvey.SampleApplication.ReliableService.AspNetCore
                 webHostBuilder: CreateWebHostBuilder(),
                 eventRequestBuilder: req =>
                 {
-                    req.RequestUri = new Uri("/test/events");
+                    req.RequestUri = new Uri("/test/events", UriKind.Relative);
                     req.Method = HttpMethod.Post;
                 },
                 errorRequestBuilder: req =>
                 {
-                    req.RequestUri = new Uri("/test/errors");
+                    req.RequestUri = new Uri("/test/errors", UriKind.Relative);
                     req.Method = HttpMethod.Post;
                 },
                 cancellationToken: cancellationToken);

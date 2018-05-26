@@ -44,19 +44,23 @@ namespace NickDarvey.ServiceFabric.EventHubs
             return factory;
         }
 
-        public static Task ProcessAsync(
+        public static async Task ProcessAsync(
             this Task<IReceiverConnection> receiverConnection,
             ProcessEvents processEvents,
             ProcessErrors processErrors,
             int? maxBatchSize = default,
             TimeSpan? waitTime = default,
-            CancellationToken cancellationToken = default) =>
-            receiverConnection.ContinueWith(t => t.Result.RunAsync(
+            CancellationToken cancellationToken = default)
+        {
+            var connection = await receiverConnection.ConfigureAwait(false);
+            await connection.RunAsync(
                 processEvents: processEvents,
                 processErrors: processErrors,
                 maxBatchSize: maxBatchSize,
                 waitTime: waitTime,
-                cancellationToken: cancellationToken));
+                cancellationToken: cancellationToken).ConfigureAwait(false);
+        }
+            
 
         private static ReliableEventHubReceiverConnectionFactory GetImplementation(IReceiverConnectionFactory @interface) =>
             @interface is ReliableEventHubReceiverConnectionFactory implementation
