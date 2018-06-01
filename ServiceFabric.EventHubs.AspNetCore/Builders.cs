@@ -13,7 +13,8 @@ namespace NickDarvey.ServiceFabric.EventHubs
             this Task<IReceiverConnection> receiver,
             IWebHostBuilder webHostBuilder,
             Action<HttpRequestMessage> eventRequestBuilder,
-            Action<HttpRequestMessage> errorRequestBuilder,
+            Action<HttpResponseMessage, HttpRequestMessage> poisonRequestBuilder = default,
+            ProcessErrors processErrors = default,
             int? maxBatchSize = default,
             TimeSpan? waitTime = default,
             CancellationToken cancellationToken = default)
@@ -21,10 +22,8 @@ namespace NickDarvey.ServiceFabric.EventHubs
             using (var server = new TestServer(webHostBuilder))
             using (var client = server.CreateClient())
             {
-                var events = Processors.CreateEventProcessor(client, eventRequestBuilder);
-                var errors = Processors.CreateErrorProcessor(client, errorRequestBuilder);
-
-                await receiver.ProcessAsync(events, errors, maxBatchSize, waitTime, cancellationToken).ConfigureAwait(false);
+                var events = Processors.CreateSerialEventProcessor(client, eventRequestBuilder, poisonRequestBuilder);
+                await receiver.ProcessAsync(events, processErrors, maxBatchSize, waitTime, cancellationToken).ConfigureAwait(false);
             }
         }
     }

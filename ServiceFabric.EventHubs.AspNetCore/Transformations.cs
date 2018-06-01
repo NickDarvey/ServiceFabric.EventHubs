@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -12,21 +13,25 @@ namespace NickDarvey.ServiceFabric.EventHubs
         {
             var request = new HttpRequestMessage();
             request.Content = new ByteArrayContent(@event.Body.Array);
+            Append(request.Content.Headers, @event.Properties);
+            Append(request.Headers, @event.SystemProperties);
+            return request;
+        }
 
-            foreach (var property in @event.Properties.Concat(@event.SystemProperties))
+        private static void Append(HttpHeaders headers, IDictionary<string, object> properties)
+        {
+            foreach (var property in properties)
             {
                 switch (property.Value)
                 {
                     case DateTime dateTime:
-                        request.Headers.TryAddWithoutValidation(property.Key, dateTime.ToString("o"));
+                        headers.TryAddWithoutValidation(property.Key, dateTime.ToString("o"));
                         break;
                     default:
-                        request.Headers.TryAddWithoutValidation(property.Key, property.Value.ToString());
+                        headers.TryAddWithoutValidation(property.Key, property.Value.ToString());
                         break;
                 }
             }
-
-            return request;
         }
 
         public static HttpRequestMessage Convert(Exception exception)
@@ -36,5 +41,6 @@ namespace NickDarvey.ServiceFabric.EventHubs
             request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("text/plain");
             return request;
         }
+
     }
 }

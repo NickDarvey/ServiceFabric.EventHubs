@@ -6,7 +6,7 @@
     <Parameter Name="EventHubPartitionCount" DefaultValue="2" />
     <Parameter Name="EventHubLowKey" DefaultValue="0" />
     <Parameter Name="EventHubHighKey" DefaultValue="1" />
-    <Parameter Name="EventHubConnectionString" DefaultValue="Endpoint=sb://ohvrzw8j1k.servicebus.windows.net/;SharedAccessKeyName=test;SharedAccessKey=xjpa5oHmOudq4fe/FOE8JzosMDPWVfALgKmjyOyhqes=;EntityPath=test" />
+    <Parameter Name="EventHubConnectionString" DefaultValue="Endpoint=sb://ohvrzw8j1k.servicebus.windows.net/;SharedAccessKeyName=test;SharedAccessKey=od+RLTEuoMZgKvEgsVsWl4jevsH6AmXBf0MDYSkeT4A=;EntityPath=testEndpoint=sb://ohvrzw8j1k.servicebus.windows.net/;SharedAccessKeyName=test;SharedAccessKey=od+RLTEuoMZgKvEgsVsWl4jevsH6AmXBf0MDYSkeT4A=;EntityPath=test" />
   </Parameters>
   <ServiceManifestImport>
     <ServiceManifestRef ServiceManifestName="ReliableService.AspNetCorePkg" ServiceManifestVersion="1.0.0" />

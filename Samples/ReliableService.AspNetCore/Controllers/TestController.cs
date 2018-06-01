@@ -12,21 +12,23 @@ namespace NickDarvey.SampleApplication.ReliableService.AspNetCore.Controllers
     public class TestController : Controller
     {
         [HttpPost("events")]
-        public Task ReceiveEvents(Cat cat)
+        public Task<IActionResult> ReceiveEvents([FromBody]Cat cat)
         {
-            ServiceEventSource.Current.Message($"Received a cat with the name '{cat.Name}'");
-            return Task.CompletedTask;
+            if (!ModelState.IsValid || cat == null) return Task.FromResult<IActionResult>(BadRequest(ModelState));
+            ServiceEventSource.Current.Message($"Received a cat named '{cat.Name}'");
+            return Task.FromResult<IActionResult>(Ok());
         }
 
-        [HttpPost("errors")]
-        public async Task ReceiveErrors()
+        [HttpPost("poison")]
+        public async Task<IActionResult> ReceiveErrors()
         {
             using (var reader = new StreamReader(Request.Body, Encoding.UTF8))
             {
-                var ex = await reader.ReadToEndAsync();
-                ServiceEventSource.Current.Error("Received an error: " + ex);
-
+                var msg = await reader.ReadToEndAsync();
+                ServiceEventSource.Current.Error($"Received a poison message from a {Request.Headers["X-Poison-StatusCode"]}: {msg}");
             }
+
+            return Ok();
         }
     }
 }

@@ -78,11 +78,13 @@ namespace NickDarvey.SampleApplication.ReliableService.AspNetCore
                     req.RequestUri = new Uri("/test/events", UriKind.Relative);
                     req.Method = HttpMethod.Post;
                 },
-                errorRequestBuilder: req =>
+                poisonRequestBuilder: (err, req) =>
                 {
-                    req.RequestUri = new Uri("/test/errors", UriKind.Relative);
+                    req.RequestUri = new Uri("/test/poison", UriKind.Relative);
                     req.Method = HttpMethod.Post;
+                    req.Headers.TryAddWithoutValidation("X-Poison-StatusCode", err.StatusCode.ToString());
                 },
+                processErrors: error => { ServiceEventSource.Current.Error(error.ToString()); return Task.CompletedTask; },
                 cancellationToken: cancellationToken);
 
         private static IWebHostBuilder CreateWebHostBuilder() =>
