@@ -9,7 +9,7 @@ namespace NickDarvey.ServiceFabric.EventHubs
 {
     internal static class Transformations
     {
-        public static HttpRequestMessage Convert(EventData @event)
+        public static HttpRequestMessage Convert(TestableEventData @event)
         {
             var request = new HttpRequestMessage();
             request.Content = new ByteArrayContent(@event.Body.Array);
@@ -20,6 +20,8 @@ namespace NickDarvey.ServiceFabric.EventHubs
 
         private static void Append(HttpHeaders headers, IDictionary<string, object> properties)
         {
+            if (properties == default) return;
+
             foreach (var property in properties)
             {
                 switch (property.Value)

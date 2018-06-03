@@ -2,6 +2,7 @@
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Services.Runtime;
 using System;
+using System.Fabric;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -14,10 +15,10 @@ namespace NickDarvey.ServiceFabric.EventHubs
 
         public struct ServiceFabricEventHubsBuilder
         {
-            internal EventHubClient Client { get; }
+            internal ITestableEventHubClient Client { get; }
             internal StatefulService Service { get; }
 
-            internal ServiceFabricEventHubsBuilder(EventHubClient client, StatefulService service)
+            internal ServiceFabricEventHubsBuilder(ITestableEventHubClient client, StatefulService service)
             {
                 Client = client;
                 Service = service;
@@ -25,10 +26,21 @@ namespace NickDarvey.ServiceFabric.EventHubs
         }
 
         public static ServiceFabricEventHubsBuilder UseServiceFabricState(this EventHubClient client, StatefulService service) =>
+            new ServiceFabricEventHubsBuilder(new TestableEventHubClient(client), service);
+
+        internal static ServiceFabricEventHubsBuilder UseServiceFabricState(this ITestableEventHubClient client, StatefulService service) =>
             new ServiceFabricEventHubsBuilder(client, service);
 
         public static IReceiverConnectionFactory WithBatchCheckpointing(this ServiceFabricEventHubsBuilder builder) =>
-            new ReliableEventHubReceiverConnectionFactory(builder.Client, builder.Service.StateManager, builder.Service.Context.ServiceName, checkpointer => (events, errors) => new BatchCheckpointEventHandler(events, errors, checkpointer));
+            new ReliableEventHubReceiverConnectionFactory(
+                client: builder.Client,
+                state: builder.Service.StateManager,
+                handlers: checkpointer => (events, errors) => new BatchCheckpointEventHandler(events, errors, checkpointer),
+                partitions: async pk =>
+                {
+                    using (var c = new FabricClient())
+                        return await Partitions.GetPartitionId(pk, builder.Service.Context.ServiceName, c, builder.Client).ConfigureAwait(false);
+                });
 
         public static IReceiverConnectionFactory WithInitialPosition(this IReceiverConnectionFactory connectionFactory, EventPosition initalPosition)
         {
@@ -55,7 +67,7 @@ namespace NickDarvey.ServiceFabric.EventHubs
             var connection = await receiverConnection.ConfigureAwait(false);
             await connection.RunAsync(
                 processEvents: processEvents,
-                processErrors:  processErrors ?? (_ => Task.CompletedTask),
+                processErrors: processErrors ?? (_ => Task.CompletedTask),
                 maxBatchSize: maxBatchSize,
                 waitTime: waitTime,
                 cancellationToken: cancellationToken).ConfigureAwait(false);

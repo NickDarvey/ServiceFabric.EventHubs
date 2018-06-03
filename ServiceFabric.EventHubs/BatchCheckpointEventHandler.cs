@@ -24,13 +24,13 @@ namespace NickDarvey.ServiceFabric.EventHubs
             _checkpoint = checkpoint;
         }
 
-        public async Task ProcessEventsAsync(IEnumerable<EventData> events)
+        public async Task ProcessEventsAsync(IEnumerable<TestableEventData> events)
         {
             await _processEvents(events).ConfigureAwait(false);
 
             var last = events.LastOrDefault();
 
-            if (last == default(EventData)) return;
+            if (last == default(TestableEventData)) return;
 
             var checkpoint = new Checkpoint(
                 sequenceNumber: last.SystemProperties.SequenceNumber,

@@ -11,12 +11,12 @@ namespace NickDarvey.ServiceFabric.EventHubs
 {
     internal class LoopingEventHubReceiverConnection : IReceiverConnection
     {
-        private readonly PartitionReceiver _receiver;
+        private readonly ITestablePartitionReceiver _receiver;
         private readonly CreateHandler _handlers;
         private readonly IEnumerable<Unit> _loop;
 
         public LoopingEventHubReceiverConnection(
-            PartitionReceiver receiver,
+            ITestablePartitionReceiver receiver,
             CreateHandler handlers,
             IEnumerable<Unit> loop)
         {
@@ -51,7 +51,7 @@ namespace NickDarvey.ServiceFabric.EventHubs
                 if (cancellationToken.IsCancellationRequested) break;
 
                 var activity = new Activity("Process");
-                var events = default(IEnumerable<EventData>);
+                var events = default(IEnumerable<TestableEventData>);
 
                 try
                 {

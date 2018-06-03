@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace NickDarvey.ServiceFabric.EventHubs
 {
-    public delegate Task ProcessEvents(IEnumerable<EventData> events);
+    public delegate Task ProcessEvents(IEnumerable<TestableEventData> events);
     public delegate Task ProcessErrors(Exception ex);
     internal delegate Task SaveCheckpoint(Checkpoint checkpoint);
     internal delegate IEventHandler CreateHandler(ProcessEvents processEvents, ProcessErrors processErrors);

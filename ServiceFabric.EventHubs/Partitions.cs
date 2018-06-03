@@ -8,7 +8,7 @@ namespace NickDarvey.ServiceFabric.EventHubs
 {
     internal static class Partitions
     {
-        public static async Task<string> GetPartitionId(long partitionKey, Uri serviceName, FabricClient fabricClient, EventHubClient eventHubClient)
+        public static async Task<string> GetPartitionId(long partitionKey, Uri serviceName, FabricClient fabricClient, ITestableEventHubClient eventHubClient)
         {
             var serviceFabricPartitions = await fabricClient.QueryManager.GetPartitionListAsync(serviceName);
             var eventHubInformation = await eventHubClient.GetRuntimeInformationAsync();

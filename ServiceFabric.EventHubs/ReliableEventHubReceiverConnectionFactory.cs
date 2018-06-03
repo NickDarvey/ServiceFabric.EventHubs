@@ -12,23 +12,23 @@ namespace NickDarvey.ServiceFabric.EventHubs
 {
     class ReliableEventHubReceiverConnectionFactory : IReceiverConnectionFactory
     {
-        private readonly EventHubClient _client;
+        private readonly ITestableEventHubClient _client;
         private readonly IReliableStateManager _state;
-        private readonly Uri _serviceName;
         private readonly Func<SaveCheckpoint, CreateHandler> _handlers;
+        private readonly Func<long, Task<string>> _partitions;
 
         public ReliableEventHubReceiverConnectionFactory(
-            EventHubClient client,
+            ITestableEventHubClient client,
             IReliableStateManager state,
-            Uri serviceName,
             Func<SaveCheckpoint, CreateHandler> handlers,
+            Func<long, Task<string>> partitions,
             EventPosition initialPosition = default,
             uint? initialEpoch = default)
         {
             _client = client;
             _state = state;
-            _serviceName = serviceName;
             _handlers = handlers;
+            _partitions = partitions;
             InitialPosition = initialPosition ?? InitialPosition;
             InitialEpoch = initialEpoch ?? InitialEpoch;
         }
@@ -41,14 +41,8 @@ namespace NickDarvey.ServiceFabric.EventHubs
             string consumerGroupName,
             CancellationToken cancel = default)
         {
-            var partitionId = await GetPartitionId(partitionKey);
+            var partitionId = await _partitions(partitionKey);
             return await TakeLease(consumerGroupName, partitionId);
-        }
-
-        protected virtual async Task<string> GetPartitionId(long partitionKey)
-        {
-            using (var fabricClient = new FabricClient())
-                return await Partitions.GetPartitionId(partitionKey, _serviceName, fabricClient, _client);
         }
 
         private async Task<IReceiverConnection> TakeLease(string consumerGroupName, string partitionId)

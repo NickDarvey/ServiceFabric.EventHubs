@@ -7,7 +7,7 @@ namespace NickDarvey.ServiceFabric.EventHubs
 {
     internal interface IEventHandler
     {
-        Task ProcessEventsAsync(IEnumerable<EventData> events);
+        Task ProcessEventsAsync(IEnumerable<TestableEventData> events);
         Task ProcessErrorAsync(Exception error);
     }
 }
