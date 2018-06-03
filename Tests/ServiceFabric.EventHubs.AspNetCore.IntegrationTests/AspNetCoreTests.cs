@@ -75,7 +75,7 @@ namespace ServiceFabric.EventHubs
             await Task.Delay(60000);
             cts.Cancel();
 
-            // Seems to get ~120,00 on my Surface Book 2
+            // Seems to get ~120,000 events/second on my Surface Book 2
             Assert.True(count > 100_000, "Evaluated " + count);
         }
     }

@@ -14,9 +14,11 @@ This package provides the glue to directly connect a service to Event Hubs, proc
 
 # Getting started
 
+## Reliable Services
+
 1. Install the NuGet package to your stateful service.
 
-    `Install-Package NickDarvey.ServiceFabric.EventHubs.ReliableServices`
+    `Install-Package NickDarvey.ServiceFabric.EventHubs`
 
 1. Create a receiver and start processing events during `RunAsync`
 
@@ -28,14 +30,78 @@ This package provides the glue to directly connect a service to Event Hubs, proc
         { }
 
         protected override Task RunAsync(CancellationToken cancellationToken) =>
+
+            // Create the Event Hub client, as you usually would.
             EventHubClient.CreateFromConnectionString("Endpoint=sb://...")
-            .UseServiceFabricState(StateManager)
+
+            // Pass in the state manager, we'll use this to do our checkpointing.
+            .UseServiceFabricState(this)
+
+            // Pick the style of checkpointing to use.
             .WithBatchCheckpointing()
-            .CreateReceiver(PartitionKey, "$Default", cancellationToken)
+
+            // Create a connection to an Event Hub partition
+            .CreateReceiver(
+                partitionKey: ((Int64RangePartitionInformation)Partition.PartitionInfo).LowKey,
+                consumerGroupName: ConsumerGroupName,
+                cancel: cancellationToken)
+
+            // Start processing events
             .ProcessAsync(
                 events => DoWork(events),
                 error => LogError(error),
                 cancellationToken: cancellationToken);
+    }
+    ```
+
+## Reliable Services (ASP.NET Core)
+
+1. Install the NuGet package to your stateful service.
+
+    `Install-Package NickDarvey.ServiceFabric.EventHubs.AspNetCore`
+
+1. Create a receiver and start processing events during `RunAsync`
+
+    ```csharp
+    internal sealed class ReliableServiceAspNetCore : StatefulService
+    {
+        public ReliableServiceAspNetCore(StatefulServiceContext context)
+            : base(context)
+        { }
+
+        protected override Task RunAsync(CancellationToken cancellationToken) =>
+            // Create the Event Hub client, as you usually would.
+            EventHubClient.CreateFromConnectionString("Endpoint=sb://...")
+
+            // Pass in the state manager, we'll use this to do our checkpointing.
+            .UseServiceFabricState(this)
+
+            // Pick the style of checkpointing to use.
+            .WithBatchCheckpointing()
+
+            // Create a connection to an Event Hub partition
+            .CreateReceiver(
+                partitionKey: ((Int64RangePartitionInformation)Partition.PartitionInfo).LowKey,
+                consumerGroupName: ConsumerGroupName,
+                cancel: cancellationToken)
+
+            // Start processing events
+            .ProcessAsync(
+                webHostBuilder: new WebHostBuilder()
+                    .UseKestrel()
+                    .UseContentRoot(Directory.GetCurrentDirectory())
+                    .UseStartup<Startup>(),
+                eventRequestBuilder: req =>
+                {
+                    req.RequestUri = new Uri("/test/events", UriKind.Relative);
+                    req.Method = HttpMethod.Post;
+                },
+                poisonRequestBuilder: (err, req) =>
+                {
+                    req.RequestUri = new Uri("/test/poison", UriKind.Relative);
+                    req.Method = HttpMethod.Post;
+                },
+                processErrors: error => { ServiceEventSource.Current.Error(error.ToString()); return Task.CompletedTask; },
     }
     ```
 
@@ -73,12 +139,10 @@ If you're updating state in your service based on events (and not simply flingin
 
   so you can figure out which partition your data is on.
 
-* Stateful ASP.NET integration
+* ~~Stateful ASP.NET integration~~
 
-  so you can process events as if it were a HTTP request (but all happening in-process)
+  ~~so you can process events as if it were a HTTP request (but all happening in-process)~~
 
 * Reliable Actors integration
   
   so you can hand off events to actors for processing
-
-
