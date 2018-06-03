@@ -25,9 +25,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReliableService.AspNetCore"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common", "Samples\Common\Common.csproj", "{E0FE26E3-0B53-4257-ABA3-D97C439F380D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceFabric.EventHubs.AspNetCore.IntegrationTests", "Tests\ServiceFabric.EventHubs.AspNetCore.IntegrationTests\ServiceFabric.EventHubs.AspNetCore.IntegrationTests.csproj", "{14FC38FF-EC76-4CD9-A731-C4041C6105AF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceFabric.EventHubs.AspNetCore.IntegrationTests", "Tests\ServiceFabric.EventHubs.AspNetCore.IntegrationTests\ServiceFabric.EventHubs.AspNetCore.IntegrationTests.csproj", "{14FC38FF-EC76-4CD9-A731-C4041C6105AF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{3B5C26E9-6A8F-4911-9B3A-C994CC104CE4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceFabric.EventHubs.Partitioning", "ServiceFabric.EventHubs.Partitioning\ServiceFabric.EventHubs.Partitioning.csproj", "{CC959A95-4EAF-4F77-86FC-E8BD562AFADF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -93,6 +95,14 @@ Global
 		{14FC38FF-EC76-4CD9-A731-C4041C6105AF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{14FC38FF-EC76-4CD9-A731-C4041C6105AF}.Release|x64.ActiveCfg = Release|Any CPU
 		{14FC38FF-EC76-4CD9-A731-C4041C6105AF}.Release|x64.Build.0 = Release|Any CPU
+		{CC959A95-4EAF-4F77-86FC-E8BD562AFADF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC959A95-4EAF-4F77-86FC-E8BD562AFADF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC959A95-4EAF-4F77-86FC-E8BD562AFADF}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CC959A95-4EAF-4F77-86FC-E8BD562AFADF}.Debug|x64.Build.0 = Debug|Any CPU
+		{CC959A95-4EAF-4F77-86FC-E8BD562AFADF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC959A95-4EAF-4F77-86FC-E8BD562AFADF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CC959A95-4EAF-4F77-86FC-E8BD562AFADF}.Release|x64.ActiveCfg = Release|Any CPU
+		{CC959A95-4EAF-4F77-86FC-E8BD562AFADF}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
