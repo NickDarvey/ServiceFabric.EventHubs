@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Azure.EventHubs" Version="2.0.0" />
-    <PackageReference Include="Microsoft.ServiceFabric.Services" Version="3.1.269" />
+    <PackageReference Include="Microsoft.ServiceFabric.Services" Version="3.1.274" />
   </ItemGroup>
 
 </Project>
