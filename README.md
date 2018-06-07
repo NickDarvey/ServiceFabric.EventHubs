@@ -1,4 +1,4 @@
-﻿A Service Fabric Reliable Services and Event Hubs integration for perfect partitioning.
+A Service Fabric Reliable Services and Event Hubs integration for perfect partitioning.
 
 ```
 Event Hub partitions            [0]    [1]    [2]    [4]
@@ -11,6 +11,8 @@ Stateful service partitions     [0]    [1]    [2]    [4]
 Event Hubs is a great entry point for a bajillion messages coming into your Service Fabric application.
 This package provides the glue to directly connect a service to Event Hubs, process events and checkpoint as it goes.
 
+# Status
+![Build Status](https://nickdarvey.visualstudio.com/_apis/public/build/definitions/d126c817-588b-46c4-9c53-93d4309bef3d/3/badge)
 
 # Getting started
 
