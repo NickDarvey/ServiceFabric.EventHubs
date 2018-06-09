@@ -84,6 +84,36 @@ namespace ServiceFabric.EventHubs
         }
 
         [Fact]
+        [Trait("Category", "Integration")]
+        public async Task Should_send_process_request()
+        {
+            var result = default(byte[]);
+            var builder = WebHost.CreateDefaultBuilder()
+                .UseUrls("http://*:5000")
+                .Configure(app => app.Run(c =>
+                {
+                    result = ((MemoryStream)c.Request.Body).ToArray();
+                    c.Response.StatusCode = StatusCodes.Status200OK;
+                    return c.Response.WriteAsync("Yup");
+                }));
+
+
+            await CreateTarget(new[] { Unit.Default }, SampleEvents)
+                .CreateReceiver(0, "Test")
+                .ProcessAsync(
+                    webHostBuilder: builder,
+                    eventRequestBuilder: req =>
+                    {
+                        req.RequestUri = new Uri("/events", UriKind.Relative);
+                        req.Method = HttpMethod.Post;
+                    });
+
+
+            Check.That(result).ContainsExactly(SampleMessage);
+        }
+
+        [Fact]
+        [Trait("Category", "Integration")]
         public async Task Should_send_poison_request_when_process_request_is_rejected()
         {
             var result = default(byte[]);
