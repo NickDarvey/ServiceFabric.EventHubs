@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
@@ -10,8 +12,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.EventHubs;
-using Microsoft.ServiceFabric.Services.Runtime;
 using Moq;
+using NFluent;
 using NickDarvey.ServiceFabric.EventHubs;
 using ServiceFabric.Mocks;
 using Xunit;
@@ -20,48 +22,53 @@ namespace ServiceFabric.EventHubs
 {
     public class AspNetCoreTests
     {
-        [Fact]
-        [Trait("Category", "Performance")]
-        [Trait("Category", "Integration")]
-        public async Task Test()
-        {
-            var count = default(int);
-            var message = Encoding.UTF8.GetBytes("Message");
-            var @event = new EventData(message);
-            @event.Properties["Test"] = "Test";
-            var props = new TestableEventData.TestableSystemPropertiesCollection(0, DateTime.MinValue, "x", "0");
-            var events = new TestableEventData[] { new TestableEventData(@event, props) };
-            var received = Task.FromResult<IEnumerable<TestableEventData>>(events);
-            var info = Task.FromResult(new EventHubRuntimeInformation()
-            {
-                PartitionCount = 1,
-                PartitionIds = new[] { "0" }
-            });
-            var cts = new CancellationTokenSource();
-            var receiver = new Mock<ITestablePartitionReceiver>();
-            var client = new Mock<ITestableEventHubClient>();
-            var ctx = MockStatefulServiceContextFactory.Default;
-            var state = new MockReliableStateManager();
-            var service = new Mock<StatefulService>(ctx, state);
-            var builder = WebHost.CreateDefaultBuilder()
-                .UseUrls("http://*:5000")
-                .Configure(app => app.Run(c => { count++; return c.Response.WriteAsync("Received"); }));
+        private static readonly string SampleMessageContent = "Message";
+        private static readonly byte[] SampleMessage = Encoding.UTF8.GetBytes(SampleMessageContent);
+        private static readonly TestableEventData.TestableSystemPropertiesCollection SampleProperties = new TestableEventData.TestableSystemPropertiesCollection(0, DateTime.MinValue, "x", "y");
+        private static readonly TestableEventData SampleEvent = new TestableEventData(new EventData(SampleMessage), SampleProperties);
+        private static readonly IEnumerable<TestableEventData> SampleEvents = new[] { SampleEvent };
 
+        private static ReliableEventHubReceiverConnectionFactory CreateTarget(IEnumerable<Unit> loop, IEnumerable<TestableEventData> events)
+        {
+            var receiver = new Mock<ITestablePartitionReceiver>();
             receiver.Setup(r => r.ReceiveAsync(
                 It.IsAny<int>(), It.IsAny<TimeSpan>()))
-                .Returns(received);
+                .Returns(Task.FromResult(events));
 
+            var client = new Mock<ITestableEventHubClient>();
             client.Setup(c => c.GetRuntimeInformationAsync())
-                .Returns(info);
+                .Returns(Task.FromResult(new EventHubRuntimeInformation() { PartitionCount = 1, PartitionIds = new[] { "0" } }));
             client.Setup(c => c.CreateEpochReceiver(
                 It.IsAny<string>(), It.IsAny<string>(), It.IsAny<EventPosition>(), It.IsAny<long>(), It.IsAny<ReceiverOptions>()))
                 .Returns(receiver.Object);
 
-            var target = Task.Run(() => new ReliableEventHubReceiverConnectionFactory(
+            var state = new MockReliableStateManager();
+
+            return new ReliableEventHubReceiverConnectionFactory(
                 client: client.Object,
                 state: state,
                 handlers: checkpointer => (ev, err) => new BatchCheckpointEventHandler(ev, err, checkpointer),
-                partitions: pk => Task.FromResult(pk.ToString()))
+                partitions: pk => Task.FromResult(pk.ToString()),
+                initialPosition: EventPosition.FromEnd(),
+                initialEpoch: 0,
+                loop: loop);
+        }
+
+
+        [Fact]
+        [Trait("Category", "Performance")]
+        [Trait("Category", "Integration")]
+        public async Task Should_be_performant()
+        {
+            var count = default(int);
+            var sw = Stopwatch.StartNew();
+            var loop = Enumerable.Repeat(Unit.Default, 100_000);
+            var builder = WebHost.CreateDefaultBuilder()
+                .UseUrls("http://*:5000")
+                .Configure(app => app.Run(c => { count++; return c.Response.WriteAsync("Received"); }));
+
+
+            await CreateTarget(loop, SampleEvents)
                 .CreateReceiver(0, "Test")
                 .ProcessAsync(
                     webHostBuilder: builder,
@@ -69,14 +76,58 @@ namespace ServiceFabric.EventHubs
                     {
                         req.RequestUri = new Uri("/", UriKind.Relative);
                         req.Method = HttpMethod.Get;
+                    });
+
+
+            // Seems to get ~2,000 events/second on my Surface Book 2
+            Check.That(sw.Elapsed.TotalSeconds).IsStrictlyLessThan(60);
+        }
+
+        [Fact]
+        public async Task Should_send_poison_request_when_process_request_is_rejected()
+        {
+            var result = default(byte[]);
+            var builder = WebHost.CreateDefaultBuilder()
+                .UseUrls("http://*:5000")
+                .Configure(app => app.Run(c =>
+                {
+                    if (c.Request.Path.Value == "/events")
+                    {
+                        c.Response.StatusCode = StatusCodes.Status400BadRequest;
+                        return c.Response.WriteAsync("Nope");
+                    }
+
+                    else if (c.Request.Path.Value == "/poison")
+                    {
+                        result = ((MemoryStream)c.Request.Body).ToArray();
+                        c.Response.StatusCode = StatusCodes.Status200OK;
+                        return c.Response.WriteAsync("Yup");
+                    }
+
+                    else
+                    {
+                        throw new NotImplementedException("Path not valid");
+                    }
+                }));
+
+
+            await CreateTarget(new[] { Unit.Default }, SampleEvents)
+                .CreateReceiver(0, "Test")
+                .ProcessAsync(
+                    webHostBuilder: builder,
+                    eventRequestBuilder: req =>
+                    {
+                        req.RequestUri = new Uri("/events", UriKind.Relative);
+                        req.Method = HttpMethod.Post;
                     },
-                    cancellationToken: cts.Token));
+                    poisonRequestBuilder: (err, req) =>
+                    {
+                        req.RequestUri = new Uri("/poison", UriKind.Relative);
+                        req.Method = HttpMethod.Post;
+                    });
 
-            await Task.Delay(60000);
-            cts.Cancel();
 
-            // Seems to get ~120,000 events/second on my Surface Book 2
-            Assert.True(count > 100_000, "Evaluated " + count);
+            Check.That(result).ContainsExactly(SampleMessage);
         }
     }
 }
