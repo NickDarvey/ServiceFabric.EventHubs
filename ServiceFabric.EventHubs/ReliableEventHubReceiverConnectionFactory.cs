@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Fabric;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,18 +24,37 @@ namespace NickDarvey.ServiceFabric.EventHubs
             Func<SaveCheckpoint, CreateHandler> handlers,
             Func<long, Task<string>> partitions,
             EventPosition initialPosition = default,
-            uint? initialEpoch = default)
+            uint? initialEpoch = default) : this(
+            client: client,
+            state: state,
+            handlers: handlers,
+            partitions: partitions,
+            initialPosition: initialPosition ?? EventPosition.FromEnd(),
+            initialEpoch: initialEpoch ?? 0,
+            loop: Loops.Infinite())
+        { }
+
+        internal ReliableEventHubReceiverConnectionFactory(
+            ITestableEventHubClient client,
+            IReliableStateManager state,
+            Func<SaveCheckpoint, CreateHandler> handlers,
+            Func<long, Task<string>> partitions,
+            EventPosition initialPosition,
+            uint initialEpoch,
+            IEnumerable<Unit> loop)
         {
             _client = client;
             _state = state;
             _handlers = handlers;
             _partitions = partitions;
-            InitialPosition = initialPosition ?? InitialPosition;
-            InitialEpoch = initialEpoch ?? InitialEpoch;
+            InitialPosition = initialPosition;
+            InitialEpoch = initialEpoch;
+            Loop = loop;
         }
 
-        public EventPosition InitialPosition { get; internal set; } = EventPosition.FromEnd();
-        public long InitialEpoch { get; internal set; } = 0;
+        public EventPosition InitialPosition { get; internal set; }
+        public long InitialEpoch { get; internal set; }
+        public IEnumerable<Unit> Loop { get; }
 
         public async Task<IReceiverConnection> CreateReceiver(
             long partitionKey,
@@ -78,7 +98,7 @@ namespace NickDarvey.ServiceFabric.EventHubs
 
                 await tx.CommitAsync();
 
-                return new LoopingEventHubReceiverConnection(receiver, handlers, Loops.Infinite());
+                return new LoopingEventHubReceiverConnection(receiver, handlers, Loop);
             }
         }
     }
