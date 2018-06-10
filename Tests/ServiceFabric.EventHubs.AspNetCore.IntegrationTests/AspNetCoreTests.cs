@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Builder;
@@ -17,6 +16,7 @@ using NFluent;
 using NickDarvey.ServiceFabric.EventHubs;
 using ServiceFabric.Mocks;
 using Xunit;
+using static NickDarvey.ServiceFabric.EventHubs.TestableSystemPropertiesCollection;
 
 namespace ServiceFabric.EventHubs
 {
@@ -24,7 +24,11 @@ namespace ServiceFabric.EventHubs
     {
         private static readonly string SampleMessageContent = "Message";
         private static readonly byte[] SampleMessage = Encoding.UTF8.GetBytes(SampleMessageContent);
-        private static readonly TestableEventData.TestableSystemPropertiesCollection SampleProperties = new TestableEventData.TestableSystemPropertiesCollection(0, DateTime.MinValue, "x", "y");
+        private static readonly TestableSystemPropertiesCollection SampleProperties = new TestableSystemPropertiesCollection(new Dictionary<string, object> {
+            { SequenceNumberName, 1L },
+            { EnqueuedTimeUtcName, DateTime.MinValue },
+            { OffsetName, "x" },
+            { PartitionKeyName, "id" }});
         private static readonly TestableEventData SampleEvent = new TestableEventData(new EventData(SampleMessage), SampleProperties);
         private static readonly IEnumerable<TestableEventData> SampleEvents = new[] { SampleEvent };
 
@@ -80,7 +84,7 @@ namespace ServiceFabric.EventHubs
 
 
             // Seems to get ~2,000 events/second on my Surface Book 2
-            Check.That(sw.Elapsed.TotalSeconds).IsStrictlyLessThan(60);
+            Check.That(sw.Elapsed.TotalSeconds).IsStrictlyLessThan(80);
         }
 
         [Fact]
@@ -110,6 +114,38 @@ namespace ServiceFabric.EventHubs
 
 
             Check.That(result).ContainsExactly(SampleMessage);
+        }
+
+        [Fact]
+        [Trait("Category", "Integration")]
+        public async Task Should_send_system_properties_as_process_request_headers()
+        {
+            var result = default(IDictionary<string, string>);
+            var builder = WebHost.CreateDefaultBuilder()
+                .UseUrls("http://*:5000")
+                .Configure(app => app.Run(c =>
+                {
+                    result = c.Request.Headers.ToDictionary(kv => kv.Key, kv => kv.Value.ToString());
+                    c.Response.StatusCode = StatusCodes.Status200OK;
+                    return c.Response.WriteAsync("Yup");
+                }));
+
+
+            await CreateTarget(new[] { Unit.Default }, SampleEvents)
+                .CreateReceiver(0, "Test")
+                .ProcessAsync(
+                    webHostBuilder: builder,
+                    eventRequestBuilder: req =>
+                    {
+                        req.RequestUri = new Uri("/events", UriKind.Relative);
+                        req.Method = HttpMethod.Post;
+                    });
+
+
+            Check.That(result[SequenceNumberName]).IsEqualTo(SampleProperties.SequenceNumber.ToString());
+            Check.That(result[EnqueuedTimeUtcName]).IsEqualTo(SampleProperties.EnqueuedTimeUtc.ToString("o"));
+            Check.That(result[OffsetName]).IsEqualTo(SampleProperties.Offset);
+            Check.That(result[PartitionKeyName]).IsEqualTo(SampleProperties.PartitionKey);
         }
 
         [Fact]

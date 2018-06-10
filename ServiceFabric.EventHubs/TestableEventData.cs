@@ -28,11 +28,7 @@ namespace NickDarvey.ServiceFabric.EventHubs
         {
             _event = @event;
             SystemProperties = @event.SystemProperties != default
-                ? new TestableSystemPropertiesCollection(
-                    @event.SystemProperties.SequenceNumber,
-                    @event.SystemProperties.EnqueuedTimeUtc,
-                    @event.SystemProperties.Offset,
-                    @event.SystemProperties.PartitionKey)
+                ? new TestableSystemPropertiesCollection(@event.SystemProperties)
                 : throw new ArgumentNullException(nameof(@event.SystemProperties));
         }
 
@@ -64,21 +60,5 @@ namespace NickDarvey.ServiceFabric.EventHubs
 
         public void Dispose() =>
             _event.Dispose();
-
-        public class TestableSystemPropertiesCollection : Dictionary<string, object>
-        {
-            public long SequenceNumber { get; }
-            public DateTime EnqueuedTimeUtc { get; }
-            public string Offset { get; }
-            public string PartitionKey { get; }
-
-            internal TestableSystemPropertiesCollection(long sequenceNumber, DateTime enqueuedTimeUtc, string offset, string partitionKey)
-            {
-                SequenceNumber = sequenceNumber;
-                EnqueuedTimeUtc = enqueuedTimeUtc;
-                Offset = offset;
-                PartitionKey = partitionKey;
-            }
-        }
     }
 }
