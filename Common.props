@@ -6,4 +6,12 @@
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <PackageIconUrl>https://raw.githubusercontent.com/NickDarvey/Brand/master/Logos/NickDarvey.Dark.256.png</PackageIconUrl>
+    <PackageLicenseUrl>https://github.com/NickDarvey/ServiceFabric.EventHubs/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/NickDarvey/ServiceFabric.EventHubs</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/NickDarvey/ServiceFabric.EventHubs</RepositoryUrl>
+    <RepositoryType>Git</RepositoryType>
+  </PropertyGroup>
+
 </Project>
