@@ -4,6 +4,7 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <IsServiceFabricServiceProject>True</IsServiceFabricServiceProject>
     <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
+    <IsPackable>false</IsPackable>
     <AssemblyName>NickDarvey.SampleApplication.ReliableService.AspNetCore</AssemblyName>
     <RootNamespace>NickDarvey.SampleApplication.ReliableService.AspNetCore</RootNamespace>
   </PropertyGroup>

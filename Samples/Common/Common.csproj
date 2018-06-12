@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <IsPackable>false</IsPackable>
     <AssemblyName>NickDarvey.SampleApplication.Common</AssemblyName>
     <RootNamespace>NickDarvey.SampleApplication.Common</RootNamespace>
   </PropertyGroup>
