@@ -7,9 +7,22 @@
   </PropertyGroup>
 
   <PropertyGroup>
+    <Description>
+      A Service Fabric Reliable Services and Event Hubs integration for perfect partitioning.
+
+      Event Hubs is a great entry point for a bajillion messages coming into your Service Fabric application.
+      This package provides the glue to directly connect a service to Event Hubs, process events and checkpoint as it goes.
+    </Description>
+  </PropertyGroup>
+
+  <PropertyGroup>
     <PackageIconUrl>https://raw.githubusercontent.com/NickDarvey/Brand/master/Logos/NickDarvey.Dark.256.png</PackageIconUrl>
     <PackageLicenseUrl>https://github.com/NickDarvey/ServiceFabric.EventHubs/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/NickDarvey/ServiceFabric.EventHubs</PackageProjectUrl>
+    <PackageTags>Service Fabric;Event Hubs;Azure;Microsoft;messaging;bus;message bus</PackageTags>
+  </PropertyGroup>
+
+  <PropertyGroup>
     <RepositoryUrl>https://github.com/NickDarvey/ServiceFabric.EventHubs</RepositoryUrl>
     <RepositoryType>Git</RepositoryType>
   </PropertyGroup>
