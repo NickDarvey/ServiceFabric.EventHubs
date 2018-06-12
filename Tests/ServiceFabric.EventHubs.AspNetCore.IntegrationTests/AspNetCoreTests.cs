@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Builder;
@@ -82,9 +83,10 @@ namespace ServiceFabric.EventHubs
                         req.Method = HttpMethod.Get;
                     });
 
-
-            // Seems to get ~2,000 events/second on my Surface Book 2
-            Check.That(sw.Elapsed.TotalSeconds).IsStrictlyLessThan(80);
+            // Seems to get ~2,000 events/second on my Surface Book 2 with the 'best performance' profile.\
+            //  Processor    Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz, 2112 Mhz, 4 Core(s), 8 Logical Processor(s)
+            //  Installed Physical Memory (RAM)    16.0 GB
+            Check.That(sw.Elapsed.TotalSeconds).IsStrictlyLessThan(60);
         }
 
         [Fact]
