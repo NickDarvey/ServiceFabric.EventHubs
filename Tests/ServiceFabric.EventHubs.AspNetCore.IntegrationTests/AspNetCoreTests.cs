@@ -19,7 +19,7 @@ using ServiceFabric.Mocks;
 using Xunit;
 using static NickDarvey.ServiceFabric.EventHubs.TestableSystemPropertiesCollection;
 
-namespace ServiceFabric.EventHubs
+namespace NickDarvey.ServiceFabric.EventHubs
 {
     public class AspNetCoreTests
     {

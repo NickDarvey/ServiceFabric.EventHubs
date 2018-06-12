@@ -8,7 +8,7 @@
 
     <AssemblyName>NickDarvey.ServiceFabric.EventHubs.AspNetCore.IntegrationTests</AssemblyName>
 
-    <RootNamespace>ServiceFabric.EventHubs</RootNamespace>
+    <RootNamespace>NickDarvey.ServiceFabric.EventHubs</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
