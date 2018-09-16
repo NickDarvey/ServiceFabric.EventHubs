@@ -30,6 +30,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ReliableService.AspNetCore\ReliableService.AspNetCore.csproj" />
+    <ProjectReference Include="..\ReliableService.Subscriber\ReliableService.Subscriber.csproj" />
     <ProjectReference Include="..\ReliableServices\ReliableService\ReliableService.csproj" />
   </ItemGroup>
   <ItemGroup>

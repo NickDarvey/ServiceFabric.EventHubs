@@ -50,7 +50,7 @@ namespace NickDarvey.ServiceFabric.EventHubs
             var state = new MockReliableStateManager();
 
             return new ReliableEventHubReceiverConnectionFactory(
-                client: client.Object,
+                client: Task.FromResult(client.Object),
                 state: state,
                 handlers: checkpointer => (ev, err) => new BatchCheckpointEventHandler(ev, err, checkpointer),
                 partitions: pk => Task.FromResult(pk.ToString()),

@@ -10,15 +10,15 @@ namespace NickDarvey.ServiceFabric.EventHubs
 {
     public static class Builders
     {
-        public static IReceiverConnectionFactory WithServiceFabricIntegration(this EventHubClient client, StatefulService service) =>
+        public static IReceiverConnectionFactory WithServiceFabricIntegration(this Task<EventHubClient> client, StatefulService service) =>
             client.UseServiceFabricState(service).WithBatchCheckpointing();
 
         public struct ServiceFabricEventHubsBuilder
         {
-            internal ITestableEventHubClient Client { get; }
+            internal Task<ITestableEventHubClient> Client { get; }
             internal StatefulService Service { get; }
 
-            internal ServiceFabricEventHubsBuilder(ITestableEventHubClient client, StatefulService service)
+            internal ServiceFabricEventHubsBuilder(Task<ITestableEventHubClient> client, StatefulService service)
             {
                 Client = client;
                 Service = service;
@@ -26,9 +26,12 @@ namespace NickDarvey.ServiceFabric.EventHubs
         }
 
         public static ServiceFabricEventHubsBuilder UseServiceFabricState(this EventHubClient client, StatefulService service) =>
-            new ServiceFabricEventHubsBuilder(new TestableEventHubClient(client), service);
+            UseServiceFabricState(Task.FromResult(client), service);
 
-        internal static ServiceFabricEventHubsBuilder UseServiceFabricState(this ITestableEventHubClient client, StatefulService service) =>
+        public static ServiceFabricEventHubsBuilder UseServiceFabricState(this Task<EventHubClient> client, StatefulService service) =>
+            new ServiceFabricEventHubsBuilder(client.ContinueWith<ITestableEventHubClient>(t => new TestableEventHubClient(t.Result)), service);
+
+        internal static ServiceFabricEventHubsBuilder UseServiceFabricState(this Task<ITestableEventHubClient> client, StatefulService service) =>
             new ServiceFabricEventHubsBuilder(client, service);
 
         public static IReceiverConnectionFactory WithBatchCheckpointing(this ServiceFabricEventHubsBuilder builder) =>
@@ -38,8 +41,11 @@ namespace NickDarvey.ServiceFabric.EventHubs
                 handlers: checkpointer => (events, errors) => new BatchCheckpointEventHandler(events, errors, checkpointer),
                 partitions: async pk =>
                 {
+                    var client = await builder.Client.ConfigureAwait(false);
                     using (var c = new FabricClient())
-                        return await Partitions.GetPartitionId(pk, builder.Service.Context.ServiceName, c, builder.Client).ConfigureAwait(false);
+                    {
+                        return await Partitions.GetPartitionId(pk, builder.Service.Context.ServiceName, c, client).ConfigureAwait(false);
+                    }
                 });
 
         public static IReceiverConnectionFactory WithInitialPosition(this IReceiverConnectionFactory connectionFactory, EventPosition initalPosition)

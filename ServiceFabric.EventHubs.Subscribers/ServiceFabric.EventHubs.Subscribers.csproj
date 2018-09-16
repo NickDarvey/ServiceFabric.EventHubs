@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../Common.props" />
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>NickDarvey.ServiceFabric.EventHubs.Subscribers</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ServiceFabric.EventHubs.Subscribables\ServiceFabric.EventHubs.Subscribables.csproj" />
+    <ProjectReference Include="..\ServiceFabric.EventHubs\ServiceFabric.EventHubs.csproj" />
+  </ItemGroup>
+
+</Project>

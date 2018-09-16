@@ -1,4 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Application xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Name="fabric:/SampleApplication" xmlns="http://schemas.microsoft.com/2011/01/fabric">
-  <Parameters />
+  <Parameters >
+    <Parameter Name="ReliableService.Subscriber_PartitionCount" Value="1" />
+    <Parameter Name="ReliableService.Subscriber_MinReplicaSetSize" Value="3" />
+    <Parameter Name="ReliableService.Subscriber_TargetReplicaSetSize" Value="3" />
+  </Parameters>
 </Application>

@@ -1,6 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ApplicationManifest xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ApplicationTypeName="SampleApplicationType" ApplicationTypeVersion="1.0.0" xmlns="http://schemas.microsoft.com/2011/01/fabric">
   <Parameters>
+    <Parameter Name="ReliableService.Subscriber_MinReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="ReliableService.Subscriber_PartitionCount" DefaultValue="1" />
+    <Parameter Name="ReliableService.Subscriber_TargetReplicaSetSize" DefaultValue="3" />
     <Parameter Name="MinReplicaSetSize" DefaultValue="1" />
     <Parameter Name="TargetReplicaSetSize" DefaultValue="1" />
     <Parameter Name="EventHubPartitionCount" DefaultValue="2" />
@@ -8,6 +11,10 @@
     <Parameter Name="EventHubHighKey" DefaultValue="1" />
     <Parameter Name="EventHubConnectionString" DefaultValue="Endpoint=sb://ohvrzw8j1k.servicebus.windows.net/;SharedAccessKeyName=test;SharedAccessKey=od+RLTEuoMZgKvEgsVsWl4jevsH6AmXBf0MDYSkeT4A=;EntityPath=testEndpoint=sb://ohvrzw8j1k.servicebus.windows.net/;SharedAccessKeyName=test;SharedAccessKey=od+RLTEuoMZgKvEgsVsWl4jevsH6AmXBf0MDYSkeT4A=;EntityPath=test" />
   </Parameters>
+  <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="ReliableService.SubscriberPkg" ServiceManifestVersion="1.0.0" />
+    <ConfigOverrides />
+  </ServiceManifestImport>
   <ServiceManifestImport>
     <ServiceManifestRef ServiceManifestName="ReliableService.AspNetCorePkg" ServiceManifestVersion="1.0.0" />
     <ConfigOverrides>
@@ -35,6 +42,11 @@
     </ConfigOverrides>
   </ServiceManifestImport>
   <DefaultServices>
+    <Service Name="ReliableService.Subscriber" ServicePackageActivationMode="ExclusiveProcess">
+      <StatefulService ServiceTypeName="ReliableService.SubscriberType" TargetReplicaSetSize="[ReliableService.Subscriber_TargetReplicaSetSize]" MinReplicaSetSize="[ReliableService.Subscriber_MinReplicaSetSize]">
+        <UniformInt64Partition PartitionCount="[ReliableService.Subscriber_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
+      </StatefulService>
+    </Service>
     <Service Name="ReliableService.AspNetCore" ServicePackageActivationMode="ExclusiveProcess">
       <StatefulService ServiceTypeName="ReliableService.AspNetCoreType" TargetReplicaSetSize="[TargetReplicaSetSize]" MinReplicaSetSize="[MinReplicaSetSize]">
         <UniformInt64Partition PartitionCount="[EventHubPartitionCount]" LowKey="[EventHubLowKey]" HighKey="[EventHubHighKey]" />

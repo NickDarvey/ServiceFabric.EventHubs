@@ -13,13 +13,13 @@ namespace NickDarvey.ServiceFabric.EventHubs
 {
     class ReliableEventHubReceiverConnectionFactory : IReceiverConnectionFactory
     {
-        private readonly ITestableEventHubClient _client;
+        private readonly Task<ITestableEventHubClient> _client;
         private readonly IReliableStateManager _state;
         private readonly Func<SaveCheckpoint, CreateHandler> _handlers;
         private readonly Func<long, Task<string>> _partitions;
 
         public ReliableEventHubReceiverConnectionFactory(
-            ITestableEventHubClient client,
+            Task<ITestableEventHubClient> client,
             IReliableStateManager state,
             Func<SaveCheckpoint, CreateHandler> handlers,
             Func<long, Task<string>> partitions,
@@ -35,7 +35,7 @@ namespace NickDarvey.ServiceFabric.EventHubs
         { }
 
         internal ReliableEventHubReceiverConnectionFactory(
-            ITestableEventHubClient client,
+            Task<ITestableEventHubClient> client,
             IReliableStateManager state,
             Func<SaveCheckpoint, CreateHandler> handlers,
             Func<long, Task<string>> partitions,
@@ -67,8 +67,9 @@ namespace NickDarvey.ServiceFabric.EventHubs
 
         private async Task<IReceiverConnection> TakeLease(string consumerGroupName, string partitionId)
         {
-            var checkpoints = await GetCheckpointState(_state, _client.EventHubName, consumerGroupName);
-            var leases = await GetLeaseState(_state, _client.EventHubName, consumerGroupName);
+            var client = await _client;
+            var checkpoints = await GetCheckpointState(_state, client.EventHubName, consumerGroupName);
+            var leases = await GetLeaseState(_state, client.EventHubName, consumerGroupName);
             async Task Checkpointer(Checkpoint checkpoint)
             {
                 using (var tx = _state.CreateTransaction())
@@ -92,7 +93,7 @@ namespace NickDarvey.ServiceFabric.EventHubs
                     ? leaseState.Value.Epoch
                     : InitialEpoch;
 
-                var receiver = _client.CreateEpochReceiver(consumerGroupName, partitionId, position, epoch);
+                var receiver = client.CreateEpochReceiver(consumerGroupName, partitionId, position, epoch);
 
                 await leases.SetAsync(tx, partitionId, new Lease(epoch));
 
